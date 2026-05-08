@@ -1,0 +1,132 @@
+{
+  "name": "pl_ingest_rest_to_bronze",
+  "properties": {
+    "description": "Parameterized REST API ingestion pipeline that lands raw JSON into ADLS Gen2 Bronze.",
+    "parameters": {
+      "storage_account_name": {
+        "type": "String"
+      },
+      "container": {
+        "type": "String",
+        "defaultValue": "datalake"
+      },
+      "source_system": {
+        "type": "String",
+        "defaultValue": "sample_api"
+      },
+      "entity_name": {
+        "type": "String",
+        "defaultValue": "orders"
+      },
+      "base_url": {
+        "type": "String"
+      },
+      "relative_url": {
+        "type": "String"
+      },
+      "load_date": {
+        "type": "String"
+      }
+    },
+    "variables": {
+      "bronze_directory": {
+        "type": "String"
+      },
+      "bronze_file_name": {
+        "type": "String"
+      }
+    },
+    "activities": [
+      {
+        "name": "Set Bronze Directory",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "bronze_directory",
+          "value": {
+            "type": "Expression",
+            "value": "@concat('bronze/', pipeline().parameters.source_system, '/', pipeline().parameters.entity_name, '/load_date=', pipeline().parameters.load_date)"
+          }
+        }
+      },
+      {
+        "name": "Set Bronze File Name",
+        "type": "SetVariable",
+        "dependsOn": [
+          {
+            "activity": "Set Bronze Directory",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "variableName": "bronze_file_name",
+          "value": {
+            "type": "Expression",
+            "value": "@concat(pipeline().parameters.entity_name, '_', pipeline().RunId, '.json')"
+          }
+        }
+      },
+      {
+        "name": "Copy REST API to Bronze JSON",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "Set Bronze File Name",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "RestSource",
+            "httpRequestTimeout": "00:01:40",
+            "requestInterval": "00.00:00:00.010",
+            "requestMethod": "GET"
+          },
+          "sink": {
+            "type": "JsonSink",
+            "storeSettings": {
+              "type": "AzureBlobFSWriteSettings"
+            },
+            "formatSettings": {
+              "type": "JsonWriteSettings"
+            }
+          },
+          "enableStaging": false
+        },
+        "inputs": [
+          {
+            "referenceName": "ds_rest_api",
+            "type": "DatasetReference",
+            "parameters": {
+              "base_url": "@pipeline().parameters.base_url",
+              "relative_url": "@pipeline().parameters.relative_url"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "ds_adls_bronze_json",
+            "type": "DatasetReference",
+            "parameters": {
+              "storage_account_name": "@pipeline().parameters.storage_account_name",
+              "container": "@pipeline().parameters.container",
+              "directory": "@variables('bronze_directory')",
+              "file_name": "@variables('bronze_file_name')"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

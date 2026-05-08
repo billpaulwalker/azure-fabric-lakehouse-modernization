@@ -1,0 +1,140 @@
+{
+  "name": "pl_ingest_file_to_bronze",
+  "properties": {
+    "description": "Parameterized file ingestion pipeline that lands vendor CSV files into ADLS Gen2 Bronze.",
+    "parameters": {
+      "storage_account_name": {
+        "type": "String"
+      },
+      "container": {
+        "type": "String",
+        "defaultValue": "datalake"
+      },
+      "source_directory": {
+        "type": "String",
+        "defaultValue": "landing/vendor"
+      },
+      "source_file_name": {
+        "type": "String"
+      },
+      "source_system": {
+        "type": "String",
+        "defaultValue": "vendor_file"
+      },
+      "entity_name": {
+        "type": "String"
+      },
+      "load_date": {
+        "type": "String"
+      }
+    },
+    "variables": {
+      "bronze_directory": {
+        "type": "String"
+      },
+      "bronze_file_name": {
+        "type": "String"
+      }
+    },
+    "activities": [
+      {
+        "name": "Set Bronze Directory",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "bronze_directory",
+          "value": {
+            "type": "Expression",
+            "value": "@concat('bronze/', pipeline().parameters.source_system, '/', pipeline().parameters.entity_name, '/load_date=', pipeline().parameters.load_date)"
+          }
+        }
+      },
+      {
+        "name": "Set Bronze File Name",
+        "type": "SetVariable",
+        "dependsOn": [
+          {
+            "activity": "Set Bronze Directory",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "variableName": "bronze_file_name",
+          "value": {
+            "type": "Expression",
+            "value": "@concat(pipeline().parameters.entity_name, '_', pipeline().RunId, '.csv')"
+          }
+        }
+      },
+      {
+        "name": "Copy CSV to Bronze",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "Set Bronze File Name",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "DelimitedTextSource",
+            "storeSettings": {
+              "type": "AzureBlobFSReadSettings",
+              "recursive": false
+            },
+            "formatSettings": {
+              "type": "DelimitedTextReadSettings"
+            }
+          },
+          "sink": {
+            "type": "DelimitedTextSink",
+            "storeSettings": {
+              "type": "AzureBlobFSWriteSettings"
+            },
+            "formatSettings": {
+              "type": "DelimitedTextWriteSettings",
+              "quoteAllText": true,
+              "fileExtension": ".csv"
+            }
+          },
+          "enableStaging": false
+        },
+        "inputs": [
+          {
+            "referenceName": "ds_adls_bronze_csv",
+            "type": "DatasetReference",
+            "parameters": {
+              "storage_account_name": "@pipeline().parameters.storage_account_name",
+              "container": "@pipeline().parameters.container",
+              "directory": "@pipeline().parameters.source_directory",
+              "file_name": "@pipeline().parameters.source_file_name"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "ds_adls_bronze_csv",
+            "type": "DatasetReference",
+            "parameters": {
+              "storage_account_name": "@pipeline().parameters.storage_account_name",
+              "container": "@pipeline().parameters.container",
+              "directory": "@variables('bronze_directory')",
+              "file_name": "@variables('bronze_file_name')"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
