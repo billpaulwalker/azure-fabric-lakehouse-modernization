@@ -1,0 +1,20 @@
+{
+  "name": "ls_rest_api",
+  "properties": {
+    "type": "RestService",
+    "parameters": {
+      "base_url": {
+        "type": "String"
+      }
+    },
+    "typeProperties": {
+      "url": "@{linkedService().base_url}",
+      "enableServerCertificateValidation": true,
+      "authenticationType": "Anonymous"
+    },
+    "connectVia": {
+      "referenceName": "AutoResolveIntegrationRuntime",
+      "type": "IntegrationRuntimeReference"
+    }
+  }
+}
