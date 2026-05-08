@@ -1,0 +1,6 @@
+customer_id,customer_name,customer_email,country
+C001,John Smith,john.smith@email.com,USA
+C002,Sarah Johnson,sarah.j@email.com,USA
+C003,Michael Brown,michael.b@email.com,Canada
+C004,Emily Davis,emily.d@email.com,UK
+C005,David Wilson,david.w@email.com,USA
