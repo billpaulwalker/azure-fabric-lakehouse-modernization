@@ -1,0 +1,40 @@
+{
+  "name": "ds_adls_bronze_csv",
+  "properties": {
+    "linkedServiceName": {
+      "referenceName": "ls_adls_gen2",
+      "type": "LinkedServiceReference",
+      "parameters": {
+        "storage_account_name": "@dataset().storage_account_name"
+      }
+    },
+    "parameters": {
+      "storage_account_name": {
+        "type": "String"
+      },
+      "container": {
+        "type": "String"
+      },
+      "directory": {
+        "type": "String"
+      },
+      "file_name": {
+        "type": "String"
+      }
+    },
+    "type": "DelimitedText",
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobFSLocation",
+        "fileSystem": "@dataset().container",
+        "folderPath": "@dataset().directory",
+        "fileName": "@dataset().file_name"
+      },
+      "columnDelimiter": ",",
+      "escapeChar": "\\",
+      "firstRowAsHeader": true,
+      "quoteChar": "\""
+    },
+    "schema": []
+  }
+}
