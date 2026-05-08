@@ -1,0 +1,45 @@
+name: Validate Azure Data Engineering Project
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Validate ADF JSON templates
+        run: |
+          python -m json.tool adf/pipelines/pl_ingest_rest_to_bronze.json > /dev/null
+          python -m json.tool adf/pipelines/pl_ingest_file_to_bronze.json > /dev/null
+          python -m json.tool adf/datasets/ds_rest_api.json > /dev/null
+          python -m json.tool adf/datasets/ds_adls_bronze_json.json > /dev/null
+          python -m json.tool adf/datasets/ds_adls_bronze_csv.json > /dev/null
+          python -m json.tool adf/linked_services/ls_adls_gen2.json > /dev/null
+          python -m json.tool adf/linked_services/ls_rest_api.json > /dev/null
+
+      - name: Lint Python files
+        run: |
+          ruff check synapse/ fabric/ tests/
+
+      - name: Run tests
+        run: |
+          pytest -q
