@@ -1,0 +1,101 @@
+{
+  "name": "pl_orchestrate_bronze_to_gold",
+  "properties": {
+    "description": "Orchestrates Bronze to Silver, data quality checks, and Silver to Gold transformations.",
+    "parameters": {
+      "storage_account_name": {
+        "type": "String"
+      },
+      "container": {
+        "type": "String",
+        "defaultValue": "datalake"
+      },
+      "load_date": {
+        "type": "String"
+      }
+    },
+    "activities": [
+      {
+        "name": "Run Bronze to Silver Orders Notebook",
+        "type": "SynapseNotebook",
+        "dependsOn": [],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "nb_bronze_to_silver_orders",
+            "type": "NotebookReference"
+          },
+          "parameters": {
+            "storage_account_name": {
+              "value": "@pipeline().parameters.storage_account_name",
+              "type": "string"
+            },
+            "container_name": {
+              "value": "@pipeline().parameters.container",
+              "type": "string"
+            },
+            "load_date": {
+              "value": "@pipeline().parameters.load_date",
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run Data Quality Checks Notebook",
+        "type": "SynapseNotebook",
+        "dependsOn": [
+          {
+            "activity": "Run Bronze to Silver Orders Notebook",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "nb_data_quality_checks",
+            "type": "NotebookReference"
+          },
+          "parameters": {
+            "storage_account_name": {
+              "value": "@pipeline().parameters.storage_account_name",
+              "type": "string"
+            },
+            "container_name": {
+              "value": "@pipeline().parameters.container",
+              "type": "string"
+            },
+            "load_date": {
+              "value": "@pipeline().parameters.load_date",
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run Silver to Gold Sales Summary Notebook",
+        "type": "SynapseNotebook",
+        "dependsOn": [
+          {
+            "activity": "Run Data Quality Checks Notebook",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "notebook": {
+            "referenceName": "nb_silver_to_gold_sales_summary",
+            "type": "NotebookReference"
+          },
+          "parameters": {
+            "storage_account_name": {
+              "value": "@pipeline().parameters.storage_account_name",
+              "type": "string"
+            },
+            "container_name": {
+              "value": "@pipeline().parameters.container",
+              "type": "string"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

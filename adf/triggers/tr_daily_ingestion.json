@@ -1,0 +1,28 @@
+{
+  "name": "tr_daily_ingestion",
+  "properties": {
+    "description": "Daily trigger for ingestion and transformation orchestration.",
+    "type": "ScheduleTrigger",
+    "typeProperties": {
+      "recurrence": {
+        "frequency": "Day",
+        "interval": 1,
+        "startTime": "2026-05-01T08:00:00Z",
+        "timeZone": "UTC"
+      }
+    },
+    "pipelines": [
+      {
+        "pipelineReference": {
+          "referenceName": "pl_orchestrate_bronze_to_gold",
+          "type": "PipelineReference"
+        },
+        "parameters": {
+          "storage_account_name": "<storage-account-name>",
+          "container": "datalake",
+          "load_date": "@formatDateTime(utcNow(), 'yyyy-MM-dd')"
+        }
+      }
+    ]
+  }
+}
