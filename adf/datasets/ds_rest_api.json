@@ -1,0 +1,25 @@
+{
+  "name": "ds_rest_api",
+  "properties": {
+    "linkedServiceName": {
+      "referenceName": "ls_rest_api",
+      "type": "LinkedServiceReference",
+      "parameters": {
+        "base_url": "@dataset().base_url"
+      }
+    },
+    "parameters": {
+      "base_url": {
+        "type": "String"
+      },
+      "relative_url": {
+        "type": "String"
+      }
+    },
+    "type": "RestResource",
+    "typeProperties": {
+      "relativeUrl": "@dataset().relative_url"
+    },
+    "schema": []
+  }
+}
