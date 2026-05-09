@@ -10,8 +10,6 @@ This project showcases a **production-style Azure data platform** built using:
 
 It is intentionally designed to demonstrate **how modern Azure data platforms evolve into Microsoft Fabric**.
 
-> 💡 This is not just a pipeline demo — it is a **real-world architecture simulation** focused on scalability, reusability, and modernization strategy.
-
 ---
 
 ## 🎯 What This Project Proves
