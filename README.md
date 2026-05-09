@@ -209,54 +209,6 @@ Example metric:
 
 ---
 
-## 💡 Why This Project Stands Out
-
-Most projects show how to move data.
-
-This project shows:
-
-✔ How to design reusable pipelines
-✔ How to structure a lakehouse
-✔ How to enforce data quality
-✔ How to serve analytics-ready data
-✔ How to modernize into Fabric
-
----
-
-## 🎤 Interview Talking Points
-
-### Why ADF?
-
-Enterprise orchestration, scheduling, and integration across Azure services.
-
-### Why ADLS?
-
-Scalable storage foundation for lakehouse architecture.
-
-### Why Synapse?
-
-Distributed compute + SQL serving over lake data.
-
-### Why Fabric?
-
-Simplifies architecture by unifying storage, compute, and BI.
-
-### What makes this senior-level?
-
-Focus on **reusability, design patterns, and migration strategy**, not just pipelines.
-
----
-
-## 📌 Resume Bullets
-
-* Designed Azure lakehouse platform using ADF, ADLS Gen2, and Synapse
-* Built reusable ingestion framework for API and file-based sources
-* Implemented PySpark transformations with validation and quarantine handling
-* Developed Synapse SQL external tables and reporting views
-* Created Azure → Fabric migration strategy and equivalent architecture
-
----
-
 ## 🔮 Future Enhancements
 
 * Metadata-driven ingestion framework
@@ -267,9 +219,3 @@ Focus on **reusability, design patterns, and migration strategy**, not just pipe
 * CI/CD deployment automation
 
 ---
-
-## 🧭 Final Positioning
-
-> This project demonstrates how to build a scalable Azure data platform today while preparing for the future with Microsoft Fabric.
-
-It reflects how real companies are evolving their data architecture — and how a senior data engineer thinks about that transition.
